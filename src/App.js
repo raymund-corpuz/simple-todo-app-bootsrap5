@@ -6,9 +6,12 @@ const App = () => {
 
   function handleSubmit(e) {
     e.preventDefault();
-    setEmailInfo([...emailInfo, newEntry]);
+    // if (!newEntry.name.trim()  !newEntry.email.trim()) return;
+    if (!newEntry.name || !newEntry.email)
+      return alert("Please input name and email");
+    const entryWithId = { ...newEntry, id: Date.now() };
+    setEmailInfo([...emailInfo, entryWithId]);
     setNewEntry({ name: "", email: "" });
-    console.log(emailInfo);
   }
 
   return (
@@ -45,11 +48,7 @@ const App = () => {
                 }
               ></textarea>
             </div>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              onClick={handleSubmit}
-            >
+            <button type="submit" class="btn btn-primary">
               Add Task
             </button>
             <button type="reset" class="btn btn-secondary ms-2">
@@ -59,13 +58,20 @@ const App = () => {
         </form>
       </div>
 
-      {emailInfo.map((item, i) => (
-        <div class=" container list-group mt-4" key={i}>
-          <div class="list-group-item d-flex justify-content-between">
-            <span>{item.name}</span>
-            <span>{item.email}</span>
-          </div>
-        </div>
+      {emailInfo.map((item) => (
+        // <div class=" container list-group mt-4" key={i}>
+        //   <div class="list-group-item d-flex justify-content-between">
+        //     <span>{item.name}</span>
+        //     <span>{item.email}</span>
+        //     <DeleteBtn />
+        //   </div>
+        // </div>
+        <TaskList
+          item={item}
+          key={item.id}
+          emailInfo={emailInfo}
+          setEmailInfo={setEmailInfo}
+        />
       ))}
     </>
   );
@@ -73,18 +79,34 @@ const App = () => {
 
 export default App;
 
-function TaskList(props) {
+function TaskList({ item, emailInfo, setEmailInfo }) {
   return (
     <div>
       <div class="container mt-4">
-        <h2>List of Rows</h2>
         <div class="list-group">
           <div class="list-group-item d-flex justify-content-between">
-            <span>{props.name}</span>
-            <span>{props.email}</span>
+            <span>{item.name}</span>
+            <span>{item.email}</span>
+            <DeleteBtn
+              id={item.id}
+              emailInfo={emailInfo}
+              setEmailInfo={setEmailInfo}
+            />
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function DeleteBtn({ id, setEmailInfo, emailInfo }) {
+  function handleDelete(id) {
+    console.log("delete", id);
+    setEmailInfo(emailInfo.filter((item) => item.id !== id));
+  }
+  return (
+    <button class="btn btn-danger ms-2" onClick={() => handleDelete(id)}>
+      Delete
+    </button>
   );
 }
